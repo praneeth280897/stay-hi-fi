@@ -25,18 +25,6 @@ public class StayHiFiController {
     @Autowired
     private StayHifiService stayHifiService;
 
-    @PostMapping(value = "/add-location")
-    public ResponseEntity<String> addLocation(@RequestBody AddLocationRequestDTO addLocationRequestDTO) {
-
-        stayHifiService.addLocation(addLocationRequestDTO);
-        return new ResponseEntity<String>("Success", HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/get-all-locations")
-    public ResponseEntity<List<LocationResponse>> getAllLocations() {
-        return stayHifiService.getAllLocations();
-    }
-
     @GetMapping(value = "/add-property-by-file")
     public String addLocationByFile(@RequestParam ("file")MultipartFile multipartFile) throws IOException {
         stayHifiService.addPropertyByFile(multipartFile);
