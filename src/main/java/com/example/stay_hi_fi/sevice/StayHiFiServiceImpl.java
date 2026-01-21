@@ -112,7 +112,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     private PropertyDetailsResponse setPropertyResponse(PropertyDetailsEntity propertyDetailsEntity) {
         PropertyDetailsResponse propertyDetailsResponse= new PropertyDetailsResponse();
-        LocationEntity locationEntity = new LocationEntity();
+        LocationResponse locationResponse = new LocationResponse();
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setAppartment(propertyDetailsEntity.getAppartment());
         propertyDetailsResponse.setPropertyType(propertyDetailsEntity.getPropertyType());
@@ -127,7 +127,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsResponse.setFeasibleVisitDate(propertyDetailsEntity.getFeasibleVisitDate());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setMoveInDate(propertyDetailsEntity.getMoveInDate());
-        propertyDetailsResponse.setLocationEntity(locationEntity);
+        propertyDetailsResponse.setLocationDetails(locationResponse);
         return propertyDetailsResponse;
     }
 
