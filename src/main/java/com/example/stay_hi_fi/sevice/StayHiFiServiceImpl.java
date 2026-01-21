@@ -150,7 +150,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
             propertyDetailsEntity.setFeasibleVisitDate(property.getFeasibleVisitDate());
             propertyDetailsEntity.setMaintenanceCharges(property.getMaintenanceCharges());
             propertyDetailsEntity.setRent(property.getRent());
-            propertyDetailsEntity.setLocationEntity(propertyDetailsEntity.getLocationEntity());
+            // propertyDetailsEntity.setLocationEntity(propertyDetailsEntity.getLocationEntity());
             properties.add(propertyDetailsEntity);
         }
         propertyDetailsRepository.saveAll(properties);
