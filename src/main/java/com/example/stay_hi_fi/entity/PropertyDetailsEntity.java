@@ -55,7 +55,7 @@ public class PropertyDetailsEntity extends AuditEntity {
     @Column(name = "location")
     private String location;
 
-    @ManyToOne()
-    @JoinColumn(name = "location_id", nullable = false)
-    private LocationEntity locationEntity;
+    // @ManyToOne()
+    // @JoinColumn(name = "location_id", nullable = false)
+    // private LocationEntity locationEntity;
 }
