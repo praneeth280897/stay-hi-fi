@@ -48,11 +48,9 @@ public class LocationServiceImpl implements LocationService{
             Boolean locationIsPresent = locationRepository.findByCityAndStateAndCountryAndArea(addLocationRequestDTO.getCity(),addLocationRequestDTO.getState(),addLocationRequestDTO.getCountry(),addLocationRequestDTO.getArea()).isPresent();
             if(!locationIsPresent) {
                 LocationEntity location = new LocationEntity();
-                location.setLongitude(addLocationRequestDTO.getLongitude());
                 location.setCountry(addLocationRequestDTO.getCountry());
                 location.setPostalCode(addLocationRequestDTO.getPostalCode());
                 location.setState(addLocationRequestDTO.getState());
-                location.setLatitude(addLocationRequestDTO.getLatitude());
                 location.setCity(addLocationRequestDTO.getCity());
                 location.setStateAbbreviation(addLocationRequestDTO.getStateAbv());
                 location.setCreatedBy(SYSTEM);

@@ -21,6 +21,5 @@ public class PropertyDetailsRequestDTO {
     private Boolean petFriendly = false;
     private String tenantPreference;
     private String mediaLinkUrl;
-    private String location;
     private AddLocationRequestDTO locationDetails;
 }

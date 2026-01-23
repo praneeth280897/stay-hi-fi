@@ -26,7 +26,6 @@ public class PropertyDetailsResponse {
     private Boolean petFriendly = false;
     private String tenantPreference;
     private String mediaLinkUrl;
-    private String location;
     private LocationResponse locationDetails;
 
 }

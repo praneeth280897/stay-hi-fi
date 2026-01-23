@@ -10,8 +10,10 @@ import java.util.List;
 @Table(name = "tbl_location",schema = "stay_hi_fi")
 public class LocationEntity extends AuditEntity {
 
+    private static final Long serialVersionID = 1L;
+
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,16 +32,17 @@ public class LocationEntity extends AuditEntity {
     @Column(name = "lon")
     private double longitude;
 
-    @Column(name="state_abv")
+    @Column(name = "state_abv")
     private String stateAbbreviation;
 
     @Column(name = "state")
     private String state;
 
-    @Column(name="area")
+    @Column(name = "area")
     private String area;
 
-     @OneToMany(mappedBy = "locationEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-     private List<PropertyDetailsEntity> propertyDetailsEntityList;
+    // One location can be used by many properties (via mapper)
+    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
+    private List<PropertyLocationMapperEntity> propertyMappings;
 
 }

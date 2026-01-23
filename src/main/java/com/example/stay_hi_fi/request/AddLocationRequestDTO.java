@@ -20,4 +20,5 @@ public class AddLocationRequestDTO {
     private Double latitude;
     private Double longitude;
     private String area;
+    private String locationUrl;
 }
