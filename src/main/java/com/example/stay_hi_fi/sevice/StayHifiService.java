@@ -3,8 +3,8 @@ package com.example.stay_hi_fi.sevice;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
+import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +19,7 @@ public interface StayHifiService {
 
     void addPropertyByFile(MultipartFile multipartFile) throws IOException;
 
-    Page<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize);
+    PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize);
 
     String addProperty(List<PropertyDetailsRequestDTO> propertyDetailsRequest);
 }

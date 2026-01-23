@@ -1,22 +1,22 @@
 package com.example.stay_hi_fi.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PropertyDetailsResponse {
 
+    private Long id;
     private String moveInDate;
     private String maintenanceCharges;
-    private String appartment;
+    private String propertyName;
     private String feasibleVisitDate;
     private String propertyType;
     private String furnishingType;

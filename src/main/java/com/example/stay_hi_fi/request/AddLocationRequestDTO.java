@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddLocationRequestDTO {
 
+    private Long id;
     private String city;
     private String country;
     private String state;

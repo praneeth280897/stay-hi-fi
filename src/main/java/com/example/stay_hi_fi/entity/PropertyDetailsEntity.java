@@ -22,8 +22,8 @@ public class PropertyDetailsEntity extends AuditEntity {
     @Column(name = "maintenance_charges")
     private String maintenanceCharges;
 
-    @Column(name = "appartment")
-    private String appartment;
+    @Column(name = "property_name")
+    private String propertyName;
 
     @Column(name = "feasible_visit_date")
     private String feasibleVisitDate;
@@ -55,7 +55,7 @@ public class PropertyDetailsEntity extends AuditEntity {
     @Column(name = "location")
     private String location;
 
-    // @ManyToOne()
-    // @JoinColumn(name = "location_id", nullable = false)
-    // private LocationEntity locationEntity;
+     @ManyToOne()
+     @JoinColumn(name = "location_id", nullable = false)
+     private LocationEntity locationEntity;
 }

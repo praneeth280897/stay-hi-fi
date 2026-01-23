@@ -7,12 +7,12 @@ import com.example.stay_hi_fi.repository.PropertyDetailsRepository;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
+import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.util.Constants;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class StayHiFiServiceImpl implements StayHifiService {
@@ -54,7 +54,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
         List<LocationEntity> locations = locationRepository.findAll();
         List<LocationResponse> response = new ArrayList<>();
-        for(LocationEntity location:locations) {
+        for (LocationEntity location : locations) {
             LocationResponse locationResponse = new LocationResponse();
             locationResponse.setCity(location.getCity());
             locationResponse.setCountry(location.getCountry());
@@ -76,14 +76,17 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
         DataFormatter formatter = new DataFormatter();
         List<PropertyDetailsEntity> propertyDetails = new ArrayList<>();
-        for(int i=1;i<sheet.getLastRowNum();i++) {
+        for (int i = 1; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
-            if(row == null) {
+            if (row == null) {
                 continue;
             }
 
             PropertyDetailsEntity propertyDetailsEntity = new PropertyDetailsEntity();
-            propertyDetailsEntity.setAppartment(row.getCell(2).getStringCellValue());
+            LocationEntity locationEntity = new LocationEntity();
+            locationEntity.setId(1L);
+            propertyDetailsEntity.setLocationEntity(locationEntity);
+            propertyDetailsEntity.setPropertyName(row.getCell(2).getStringCellValue());
             propertyDetailsEntity.setLocation(row.getCell(3).getStringCellValue());
             propertyDetailsEntity.setFeasibleVisitDate(row.getCell(4).getStringCellValue());
             propertyDetailsEntity.setPropertyType(row.getCell(5).getStringCellValue());
@@ -103,18 +106,33 @@ public class StayHiFiServiceImpl implements StayHifiService {
     }
 
     @Override
-    public Page<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+    public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(pageable);
-        List<PropertyDetailsResponse> propertyDetails =propertyDetailsList.getContent().stream().map(this::setPropertyResponse).collect(Collectors.toList());
-        return new PageImpl<>(propertyDetails,pageable,propertyDetailsList.getTotalElements());
+        Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
+
+        return new PaginationResponseDTO(propertyDetails);
     }
 
     private PropertyDetailsResponse setPropertyResponse(PropertyDetailsEntity propertyDetailsEntity) {
-        PropertyDetailsResponse propertyDetailsResponse= new PropertyDetailsResponse();
+        PropertyDetailsResponse propertyDetailsResponse = new PropertyDetailsResponse();
+
         LocationResponse locationResponse = new LocationResponse();
+        locationResponse.setCity(propertyDetailsEntity.getLocationEntity().getCity());
+        locationResponse.setId(propertyDetailsEntity.getLocationEntity().getId());
+        locationResponse.setLongitude(propertyDetailsEntity.getLocationEntity().getLongitude());
+        locationResponse.setCountry(propertyDetailsEntity.getLocationEntity().getCountry());
+        locationResponse.setCity(propertyDetailsEntity.getLocationEntity().getCity());
+        locationResponse.setState(propertyDetailsEntity.getLocationEntity().getState());
+        locationResponse.setPostalCode(propertyDetailsEntity.getLocationEntity().getPostalCode());
+        locationResponse.setArea(propertyDetailsEntity.getLocationEntity().getArea());
+        locationResponse.setLatitude(propertyDetailsEntity.getLocationEntity().getLatitude());
+        locationResponse.setStateAbv(propertyDetailsEntity.getLocationEntity().getStateAbbreviation());
+        propertyDetailsResponse.setLocationDetails(locationResponse);
+        propertyDetailsResponse.setId(propertyDetailsEntity.getId());
+        propertyDetailsResponse.setTenantPreference(propertyDetailsEntity.getTenantPreference());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
-        propertyDetailsResponse.setAppartment(propertyDetailsEntity.getAppartment());
+        propertyDetailsResponse.setPropertyName(propertyDetailsEntity.getPropertyName());
         propertyDetailsResponse.setPropertyType(propertyDetailsEntity.getPropertyType());
         propertyDetailsResponse.setPropertyDescription(propertyDetailsEntity.getPropertyDescription());
         propertyDetailsResponse.setLocation(propertyDetailsEntity.getLocation());
@@ -127,7 +145,6 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsResponse.setFeasibleVisitDate(propertyDetailsEntity.getFeasibleVisitDate());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setMoveInDate(propertyDetailsEntity.getMoveInDate());
-        propertyDetailsResponse.setLocationDetails(locationResponse);
         return propertyDetailsResponse;
     }
 
@@ -135,13 +152,13 @@ public class StayHiFiServiceImpl implements StayHifiService {
     public String addProperty(List<PropertyDetailsRequestDTO> propertyDetailsRequest) {
 
         List<PropertyDetailsEntity> properties = new ArrayList<>();
-        for(PropertyDetailsRequestDTO property :propertyDetailsRequest) {
+        for (PropertyDetailsRequestDTO property : propertyDetailsRequest) {
             PropertyDetailsEntity propertyDetailsEntity = new PropertyDetailsEntity();
             propertyDetailsEntity.setPropertyType(property.getPropertyType());
             propertyDetailsEntity.setPropertyDescription(property.getPropertyDescription());
             propertyDetailsEntity.setDeposit(property.getDeposit());
             propertyDetailsEntity.setLocation(property.getLocation());
-            propertyDetailsEntity.setAppartment(property.getAppartment());
+            propertyDetailsEntity.setPropertyName(property.getPropertyName());
             propertyDetailsEntity.setPetFriendly(property.getPetFriendly());
             propertyDetailsEntity.setMediaLinkUrl(property.getMediaLinkUrl());
             propertyDetailsEntity.setTenantPreference(property.getTenantPreference());
@@ -150,7 +167,12 @@ public class StayHiFiServiceImpl implements StayHifiService {
             propertyDetailsEntity.setFeasibleVisitDate(property.getFeasibleVisitDate());
             propertyDetailsEntity.setMaintenanceCharges(property.getMaintenanceCharges());
             propertyDetailsEntity.setRent(property.getRent());
-            // propertyDetailsEntity.setLocationEntity(propertyDetailsEntity.getLocationEntity());
+            Optional<LocationEntity> location = locationRepository.findById(property.getLocationDetails().getId());
+            if(location.isPresent()) {
+                propertyDetailsEntity.setLocationEntity(location.get());
+            } else {
+                new ResponseEntity<>("Enter Correct Location",HttpStatus.BAD_REQUEST);
+            }
             properties.add(propertyDetailsEntity);
         }
         propertyDetailsRepository.saveAll(properties);

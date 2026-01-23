@@ -39,7 +39,7 @@ public class LocationEntity extends AuditEntity {
     @Column(name="area")
     private String area;
 
-    // @OneToMany(mappedBy = "locationEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    // private List<PropertyDetailsEntity> propertyDetailsEntityList;
+     @OneToMany(mappedBy = "locationEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+     private List<PropertyDetailsEntity> propertyDetailsEntityList;
 
 }

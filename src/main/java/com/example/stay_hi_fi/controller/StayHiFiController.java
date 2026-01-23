@@ -3,6 +3,7 @@ package com.example.stay_hi_fi.controller;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
+import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.StayHifiService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +33,12 @@ public class StayHiFiController {
     }
 
     @GetMapping(value = "/get/all/properties")
-    public ResponseEntity<Page<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10") int pageSize,
-                                                                               @RequestParam(defaultValue = "0")int pageNumber) {
-        return new ResponseEntity<>(stayHifiService.getAllPropertyDetails(pageNumber,pageSize),HttpStatus.OK);
+    public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10") int pageSize,
+
+                                                                                                @RequestParam(defaultValue = "0")int pageNumber) {
+        PaginationResponseDTO<PropertyDetailsResponse> response =
+                stayHifiService.getAllPropertyDetails(pageNumber, pageSize);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/add")

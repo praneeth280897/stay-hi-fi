@@ -11,7 +11,7 @@ public class PropertyDetailsRequestDTO {
 
     private String moveInDate;
     private String maintenanceCharges;
-    private String appartment;
+    private String propertyName;
     private String feasibleVisitDate;
     private String propertyType;
     private String furnishingType;

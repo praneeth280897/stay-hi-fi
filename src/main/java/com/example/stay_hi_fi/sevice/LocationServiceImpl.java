@@ -43,7 +43,7 @@ public class LocationServiceImpl implements LocationService{
     @Override
     public String addNewLocation(List<AddLocationRequestDTO> locationRequestDTO) {
 
-        List<LocationEntity> locationEntities = new ArrayList<>();
+            List<LocationEntity> locationEntities = new ArrayList<>();
         for(AddLocationRequestDTO addLocationRequestDTO:locationRequestDTO) {
             Boolean locationIsPresent = locationRepository.findByCityAndStateAndCountryAndArea(addLocationRequestDTO.getCity(),addLocationRequestDTO.getState(),addLocationRequestDTO.getCountry(),addLocationRequestDTO.getArea()).isPresent();
             if(!locationIsPresent) {
