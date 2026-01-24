@@ -2,12 +2,13 @@ package com.example.stay_hi_fi.repository;
 
 import com.example.stay_hi_fi.entity.PropertyDetailsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PropertyDetailsRepository extends JpaRepository<PropertyDetailsEntity, Long> {
+public interface PropertyDetailsRepository extends JpaRepository<PropertyDetailsEntity, Long>, JpaSpecificationExecutor<PropertyDetailsEntity> {
 
     @Query(value = "SELECT *, ( " +
             "    6371 * acos( " +

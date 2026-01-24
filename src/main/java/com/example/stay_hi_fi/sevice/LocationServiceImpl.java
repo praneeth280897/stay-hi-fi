@@ -23,18 +23,28 @@ public class LocationServiceImpl implements LocationService{
     private LocationRepository locationRepository;
 
     @Override
-    public List<LocationResponse> getAllLocations() {
+    public List<LocationResponse> getAllLocations(String searchTerm) {
 
+        List<LocationEntity> locationEntities = new ArrayList<>();
+        if(searchTerm!=null) {
+            return getLocationResponses(locationRepository.findByAreaContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(searchTerm,searchTerm,searchTerm));
+        }
+        return getLocationResponses( locationRepository.findAll());
+    }
+
+    private List<LocationResponse> getLocationResponses(List<LocationEntity> locationEntities) {
         List<LocationResponse> locations = new ArrayList<>();
-        List<LocationEntity> locationEntities = locationRepository.findAll();
-        for(LocationEntity locationEntity :locationEntities) {
+        for(LocationEntity locationEntity : locationEntities) {
             LocationResponse location = new LocationResponse();
+            location.setId(locationEntity.getId());
             location.setStateAbv(locationEntity.getStateAbbreviation());
             location.setLatitude(locationEntity.getLatitude());
             location.setLongitude(locationEntity.getLongitude());
             location.setPostalCode(locationEntity.getPostalCode());
             location.setCountry(locationEntity.getCountry());
             location.setCity(locationEntity.getCity());
+            location.setArea(locationEntity.getArea());
+            location.setState(locationEntity.getState());
             locations.add(location);
         }
         return locations;

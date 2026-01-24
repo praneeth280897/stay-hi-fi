@@ -2,6 +2,7 @@ package com.example.stay_hi_fi.sevice;
 
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
+import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
@@ -22,4 +23,6 @@ public interface StayHifiService {
     PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize);
 
     String addProperty(List<PropertyDetailsRequestDTO> propertyDetailsRequest);
+
+    PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO propertyDetailsSearchRequestDTO, int pageNumber, int pageSize);
 }

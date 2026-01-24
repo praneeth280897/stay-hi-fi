@@ -2,6 +2,7 @@ package com.example.stay_hi_fi.controller;
 
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
+import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
@@ -44,5 +45,14 @@ public class StayHiFiController {
     @PostMapping(value = "/add")
     public ResponseEntity<String> addProperty(@RequestBody List<PropertyDetailsRequestDTO> propertyDetailsRequest) {
         return new ResponseEntity<>(stayHifiService.addProperty(propertyDetailsRequest),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/search")
+    public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> searchPropertyBy(@RequestBody PropertyDetailsSearchRequestDTO propertyDetailsSearchRequestDTO,
+                                                                                        @RequestParam(defaultValue = "10") int pageSize,
+                                                                                           @RequestParam(defaultValue = "0")int pageNumber) {
+        PaginationResponseDTO<PropertyDetailsResponse> response =
+                stayHifiService.searchPropertyBy(propertyDetailsSearchRequestDTO,pageNumber,pageSize);
+        return ResponseEntity.ok(response);
     }
 }

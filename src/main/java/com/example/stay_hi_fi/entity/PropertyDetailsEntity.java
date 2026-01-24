@@ -35,7 +35,7 @@ public class PropertyDetailsEntity extends AuditEntity {
     private String furnishingType;
 
     @Column(name = "rent")
-    private String rent;
+    private Double rent;
 
     @Column(name = "deposit")
     private String deposit;

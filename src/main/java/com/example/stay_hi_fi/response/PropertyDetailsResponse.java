@@ -20,7 +20,7 @@ public class PropertyDetailsResponse {
     private String feasibleVisitDate;
     private String propertyType;
     private String furnishingType;
-    private String rent;
+    private Double rent;
     private String deposit;
     private String propertyDescription;
     private Boolean petFriendly = false;

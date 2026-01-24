@@ -8,6 +8,7 @@ import com.example.stay_hi_fi.repository.PropertyDetailsRepository;
 import com.example.stay_hi_fi.repository.PropertyLocationMapperEntityRepository;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
+import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
@@ -17,11 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -94,7 +100,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
             propertyDetailsEntity.setLocation(row.getCell(3).getStringCellValue());
             propertyDetailsEntity.setFeasibleVisitDate(row.getCell(4).getStringCellValue());
             propertyDetailsEntity.setPropertyType(row.getCell(5).getStringCellValue());
-            propertyDetailsEntity.setRent(formatter.formatCellValue(row.getCell(7)));
+            propertyDetailsEntity.setRent(Double.valueOf(row.getCell(7).getNumericCellValue()));
             propertyDetailsEntity.setFurnishingType(row.getCell(6).getStringCellValue());
             propertyDetailsEntity.setDeposit(formatter.formatCellValue(row.getCell(8)));
             propertyDetailsEntity.setMaintenanceCharges(formatter.formatCellValue(row.getCell(10)));
@@ -159,6 +165,10 @@ public class StayHiFiServiceImpl implements StayHifiService {
         locationResponse.setCity(propertyLocationMapper.getLocation().getCity());
         locationResponse.setCountry(propertyLocationMapper.getLocation().getCountry());
         locationResponse.setPostalCode(propertyLocationMapper.getLocation().getPostalCode());
+        locationResponse.setState(propertyLocationMapper.getLocation().getState());
+        locationResponse.setArea(propertyLocationMapper.getArea());
+        locationResponse.setLatitude(propertyLocationMapper.getLatitude()!=null? propertyLocationMapper.getLatitude() : null);
+        locationResponse.setLongitude(propertyLocationMapper.getLongitude()!=null ? propertyLocationMapper.getLongitude() : null);
         return locationResponse;
     }
 
@@ -201,5 +211,38 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsRepository.saveAll(properties);
         propertyLocationMapperEntityRepository.saveAll(propertyLocationMapperEntities);
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO requestDTO, int pageNumber, int pageSize) {
+        Specification<PropertyDetailsEntity> spec = getSearchQuery(requestDTO);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(spec,pageable);
+        Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
+        return new PaginationResponseDTO(propertyDetails);
+    }
+
+    private Specification<PropertyDetailsEntity> getSearchQuery(PropertyDetailsSearchRequestDTO requestDTO) {
+        Specification<PropertyDetailsEntity> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if(requestDTO.getRent()!= null) {
+                predicates.add(cb.lessThan(root.get("rent"), requestDTO.getRent()));
+            }
+            if(requestDTO.getPetFriendly() != null) {
+                predicates.add(cb.equal(root.get("petFriendly"), requestDTO.getPetFriendly()));
+            }
+            if(requestDTO.getPropertyName() != null) {
+                predicates.add(cb.equal(root.get("propertyName"), requestDTO.getPropertyName()));
+            }
+            if(requestDTO.getPropertyType() != null) {
+                predicates.add(cb.equal(root.get("propertyType"), requestDTO.getPropertyType()));
+            }
+            if(requestDTO.getFurnishingType() != null) {
+                predicates.add(cb.equal(root.get("furnishingType"), requestDTO.getFurnishingType()));
+            }
+            return cb.and(predicates.toArray(predicates.toArray(new Predicate[0])));
+        };
+        return spec;
     }
 }

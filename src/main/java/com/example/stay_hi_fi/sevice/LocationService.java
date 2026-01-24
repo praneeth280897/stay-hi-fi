@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LocationService {
 
-    List<LocationResponse> getAllLocations();
+    List<LocationResponse> getAllLocations(String searchTerm);
 
     String addNewLocation(List<AddLocationRequestDTO> locationRequestDTO);
 }

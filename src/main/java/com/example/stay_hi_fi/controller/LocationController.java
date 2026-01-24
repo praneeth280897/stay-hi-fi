@@ -21,8 +21,8 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<LocationResponse>> getAllLocations() {
-        return  new ResponseEntity<>(locationService.getAllLocations(), HttpStatus.OK);
+    public ResponseEntity<List<LocationResponse>> getAllLocations(@RequestParam (value = "searchTerm") String searchTerm) {
+        return  new ResponseEntity<>(locationService.getAllLocations(searchTerm), HttpStatus.OK);
     }
 
     @PostMapping("/add-location")
