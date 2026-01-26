@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<LocationResponse>> getAllLocations(@RequestParam (value = "searchTerm") String searchTerm) {
+    public ResponseEntity<List<LocationResponse>> getAllLocations(@RequestParam (value = "searchTerm",required = false)  String searchTerm) {
         return  new ResponseEntity<>(locationService.getAllLocations(searchTerm), HttpStatus.OK);
     }
 
@@ -30,4 +29,5 @@ public class LocationController {
     public ResponseEntity<String> addNewLocation(@RequestBody List<AddLocationRequestDTO> locationRequestDTO) {
         return new ResponseEntity<>(locationService.addNewLocation(locationRequestDTO),HttpStatus.OK);
     }
+
 }

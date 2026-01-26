@@ -29,7 +29,7 @@ public class LocationServiceImpl implements LocationService{
         if(searchTerm!=null) {
             return getLocationResponses(locationRepository.findByAreaContainingIgnoreCaseOrCityContainingIgnoreCaseOrStateContainingIgnoreCase(searchTerm,searchTerm,searchTerm));
         }
-        return getLocationResponses( locationRepository.findAll());
+        return getLocationResponses(locationRepository.findAll());
     }
 
     private List<LocationResponse> getLocationResponses(List<LocationEntity> locationEntities) {

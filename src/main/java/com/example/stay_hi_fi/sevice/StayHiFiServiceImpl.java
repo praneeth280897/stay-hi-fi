@@ -24,10 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -45,6 +44,9 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     @Autowired
     private PropertyLocationMapperEntityRepository propertyLocationMapperEntityRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public String addLocation(AddLocationRequestDTO addLocationRequestDTO) {
@@ -158,6 +160,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     private LocationResponse mapLocation(PropertyLocationMapperEntity propertyLocationMapper) {
         LocationResponse locationResponse = new LocationResponse();
+        locationResponse.setId(propertyLocationMapper.getLocation().getId());
         locationResponse.setLongitude(propertyLocationMapper.getLongitude());
         locationResponse.setLocationUrl(propertyLocationMapper.getLocationUrl());
         locationResponse.setArea(propertyLocationMapper.getArea());
@@ -222,27 +225,47 @@ public class StayHiFiServiceImpl implements StayHifiService {
         return new PaginationResponseDTO(propertyDetails);
     }
 
-    private Specification<PropertyDetailsEntity> getSearchQuery(PropertyDetailsSearchRequestDTO requestDTO) {
-        Specification<PropertyDetailsEntity> spec = (root, query, cb) -> {
+    private Specification<PropertyDetailsEntity> getSearchQuery(PropertyDetailsSearchRequestDTO dto) {
+        return (root, query, cb) -> {
+
+            Join<PropertyDetailsEntity, PropertyLocationMapperEntity> mapperJoin =
+                    root.join("propertyLocationMapper", JoinType.LEFT);
+
+            Join<PropertyLocationMapperEntity, LocationEntity> locationJoin =
+                    mapperJoin.join("location", JoinType.LEFT);
+
             List<Predicate> predicates = new ArrayList<>();
 
-            if(requestDTO.getRent()!= null) {
-                predicates.add(cb.lessThan(root.get("rent"), requestDTO.getRent()));
+            if (dto.getRent() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("rent"), dto.getRent()));
             }
-            if(requestDTO.getPetFriendly() != null) {
-                predicates.add(cb.equal(root.get("petFriendly"), requestDTO.getPetFriendly()));
+
+            if (dto.getPetFriendly() != null) {
+                predicates.add(cb.equal(root.get("petFriendly"), dto.getPetFriendly()));
             }
-            if(requestDTO.getPropertyName() != null) {
-                predicates.add(cb.equal(root.get("propertyName"), requestDTO.getPropertyName()));
+
+            if (dto.getPropertyName() != null) {
+                predicates.add(cb.like(cb.lower(root.get("propertyName")),
+                        "%" + dto.getPropertyName().toLowerCase() + "%"));
             }
-            if(requestDTO.getPropertyType() != null) {
-                predicates.add(cb.equal(root.get("propertyType"), requestDTO.getPropertyType()));
+
+            if (dto.getPropertyType() != null) {
+                predicates.add(cb.equal(root.get("propertyType"), dto.getPropertyType()));
             }
-            if(requestDTO.getFurnishingType() != null) {
-                predicates.add(cb.equal(root.get("furnishingType"), requestDTO.getFurnishingType()));
+
+            if (dto.getFurnishingType() != null) {
+                predicates.add(cb.equal(root.get("furnishingType"), dto.getFurnishingType()));
             }
-            return cb.and(predicates.toArray(predicates.toArray(new Predicate[0])));
+
+            if (dto.getLocation() != null && dto.getLocation().getId() != null) {
+                predicates.add(cb.equal(locationJoin.get("id"), dto.getLocation().getId()));
+            }
+
+//            if(dto.getLocation() != null)
+
+            query.distinct(true);
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return spec;
     }
+
 }
