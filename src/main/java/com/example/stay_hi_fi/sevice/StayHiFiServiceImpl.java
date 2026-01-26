@@ -26,7 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -97,7 +99,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
             }
 
             PropertyDetailsEntity propertyDetailsEntity = new PropertyDetailsEntity();
-           Optional<LocationEntity> location = locationRepository.findById(1L);
+            Optional<LocationEntity> location = locationRepository.findById(1L);
             propertyDetailsEntity.setPropertyName(row.getCell(2).getStringCellValue());
             propertyDetailsEntity.setLocation(row.getCell(3).getStringCellValue());
             propertyDetailsEntity.setFeasibleVisitDate(row.getCell(4).getStringCellValue());
@@ -170,8 +172,8 @@ public class StayHiFiServiceImpl implements StayHifiService {
         locationResponse.setPostalCode(propertyLocationMapper.getLocation().getPostalCode());
         locationResponse.setState(propertyLocationMapper.getLocation().getState());
         locationResponse.setArea(propertyLocationMapper.getArea());
-        locationResponse.setLatitude(propertyLocationMapper.getLatitude()!=null? propertyLocationMapper.getLatitude() : null);
-        locationResponse.setLongitude(propertyLocationMapper.getLongitude()!=null ? propertyLocationMapper.getLongitude() : null);
+        locationResponse.setLatitude(propertyLocationMapper.getLatitude() != null ? propertyLocationMapper.getLatitude() : null);
+        locationResponse.setLongitude(propertyLocationMapper.getLongitude() != null ? propertyLocationMapper.getLongitude() : null);
         return locationResponse;
     }
 
@@ -196,18 +198,29 @@ public class StayHiFiServiceImpl implements StayHifiService {
             propertyDetailsEntity.setFeasibleVisitDate(property.getFeasibleVisitDate());
             propertyDetailsEntity.setMaintenanceCharges(property.getMaintenanceCharges());
             propertyDetailsEntity.setRent(property.getRent());
-            Optional<LocationEntity> location = locationRepository.findById(property.getLocationDetails().getId());
-            if(location.isPresent()) {
-                propertyLocationMapperEntity.setLocation(location.get());
+            Optional<LocationEntity> location = locationRepository.findByCityAndStateAndCountryAndArea(property.getLocationDetails().getCity(), property.getLocationDetails().getState(), property.getLocationDetails().getCountry(), property.getLocationDetails().getArea());
+            LocationEntity locationEntity = new LocationEntity();
+            if (location.isPresent()) {
+                locationEntity = location.get();
             } else {
-                new ResponseEntity<>("Enter Correct Location",HttpStatus.BAD_REQUEST);
+                locationEntity.setArea(property.getLocationDetails().getArea());
+                locationEntity.setLatitude(property.getLocationDetails().getLatitude());
+                locationEntity.setLongitude(property.getLocationDetails().getLongitude());
+                locationEntity.setState(property.getLocationDetails().getState());
+                locationEntity.setCountry(property.getLocationDetails().getCountry());
+                locationEntity.setCountry(property.getLocationDetails().getCountry());
+                locationEntity.setCity(property.getLocationDetails().getCity());
+                locationEntity.setPostalCode(property.getLocationDetails().getPostalCode());
+                locationEntity.setStateAbbreviation(property.getLocationDetails().getStateAbv());
+                locationRepository.save(locationEntity);
             }
+            propertyLocationMapperEntity.setLocation(locationEntity);
             propertyLocationMapperEntity.setProperty(propertyDetailsEntity);
             propertyLocationMapperEntity.setArea(property.getLocationDetails().getArea());
             propertyLocationMapperEntity.setLatitude(property.getLocationDetails().getLatitude());
             propertyLocationMapperEntity.setLongitude(property.getLocationDetails().getLongitude());
             propertyLocationMapperEntity.setLocationUrl(property.getLocationDetails().getLocationUrl());
-            propertyLocationMapperEntity.setLocation(location.get());
+            propertyLocationMapperEntity.setLocation(locationEntity);
             propertyLocationMapperEntities.add(propertyLocationMapperEntity);
             properties.add(propertyDetailsEntity);
         }
@@ -220,7 +233,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
     public PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO requestDTO, int pageNumber, int pageSize) {
         Specification<PropertyDetailsEntity> spec = getSearchQuery(requestDTO);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(spec,pageable);
+        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(spec, pageable);
         Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
         return new PaginationResponseDTO(propertyDetails);
     }

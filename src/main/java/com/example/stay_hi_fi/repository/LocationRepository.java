@@ -20,4 +20,5 @@ public interface LocationRepository extends JpaRepository<LocationEntity,Long> {
             String state
     );
 
+
 }

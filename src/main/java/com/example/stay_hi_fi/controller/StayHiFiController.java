@@ -35,9 +35,9 @@ public class StayHiFiController {
     }
 
     @GetMapping(value = "/get/all/properties")
-    public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10") int pageSize,
+        public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10",value = "size") int pageSize,
 
-                                                                                                @RequestParam(defaultValue = "0")int pageNumber) {
+                                                                                                @RequestParam(defaultValue = "0",value = "page")int pageNumber) {
         PaginationResponseDTO<PropertyDetailsResponse> response =
                 stayHifiService.getAllPropertyDetails(pageNumber, pageSize);
         return ResponseEntity.ok(response);
