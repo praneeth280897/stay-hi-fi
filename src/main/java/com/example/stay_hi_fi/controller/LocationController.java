@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@CrossOrigin(originPatterns = "*")
 @RequestMapping("/location")
 public class LocationController {
 

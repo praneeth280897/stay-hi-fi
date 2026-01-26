@@ -21,6 +21,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@CrossOrigin(originPatterns = "*")
 @RequestMapping(value = "/property")
 public class StayHiFiController {
 
