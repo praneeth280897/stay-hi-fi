@@ -2,6 +2,9 @@ package com.example.stay_hi_fi.controller;
 
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
+import com.example.stay_hi_fi.response.MetroCitiesResponseDTO;
+import com.example.stay_hi_fi.response.PaginationResponseDTO;
+import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,10 @@ public class LocationController {
     @PostMapping("/add-location")
     public ResponseEntity<String> addNewLocation(@RequestBody List<AddLocationRequestDTO> locationRequestDTO) {
         return new ResponseEntity<>(locationService.addNewLocation(locationRequestDTO),HttpStatus.OK);
+    }
+    @GetMapping("/get-metro-cities")
+    public ResponseEntity<List<MetroCitiesResponseDTO>> getMetroCities() {
+        return new ResponseEntity<>(locationService.getMetroCities(),HttpStatus.OK);
     }
 
 }

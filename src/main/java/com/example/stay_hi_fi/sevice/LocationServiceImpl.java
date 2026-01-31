@@ -5,6 +5,7 @@ import com.example.stay_hi_fi.entity.LocationEntity;
 import com.example.stay_hi_fi.repository.LocationRepository;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
+import com.example.stay_hi_fi.response.MetroCitiesResponseDTO;
 import com.example.stay_hi_fi.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class LocationServiceImpl implements LocationService{
             location.setCity(locationEntity.getCity());
             location.setArea(locationEntity.getArea());
             location.setState(locationEntity.getState());
+            location.setPropertiesCount(locationEntity.getPropertyMappings().stream().count());
             locations.add(location);
         }
         return locations;
@@ -72,5 +74,10 @@ public class LocationServiceImpl implements LocationService{
         }
         locationRepository.saveAll(locationEntities);
         return Constants.SUCCESS;
+    }
+
+    @Override
+    public List<MetroCitiesResponseDTO> getMetroCities() {
+        return null;
     }
 }

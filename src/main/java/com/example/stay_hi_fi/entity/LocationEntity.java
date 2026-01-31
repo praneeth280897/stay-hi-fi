@@ -41,6 +41,9 @@ public class LocationEntity extends AuditEntity {
     @Column(name = "area")
     private String area;
 
+    @Column(name = "is_metro_city")
+    private Boolean isMetroCity;
+
     // One location can be used by many properties (via mapper)
     @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
     private List<PropertyLocationMapperEntity> propertyMappings;

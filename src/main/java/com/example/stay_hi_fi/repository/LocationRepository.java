@@ -20,5 +20,7 @@ public interface LocationRepository extends JpaRepository<LocationEntity,Long> {
             String state
     );
 
+    List<LocationEntity> findByIsMetroCity(Boolean isMetroCity);
+
 
 }

@@ -20,4 +20,5 @@ public class LocationResponse {
     private Double longitude;
     private String area;
     private String locationUrl;
+    private Long propertiesCount;
 }
