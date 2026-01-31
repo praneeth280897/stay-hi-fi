@@ -23,12 +23,12 @@ public class LocationController {
     @Autowired
     private LocationService locationService;
 
-    @GetMapping("/get-all")
+    @GetMapping("/get")
     public ResponseEntity<List<LocationResponse>> getAllLocations(@RequestParam (value = "searchTerm",required = false)  String searchTerm) {
         return  new ResponseEntity<>(locationService.getAllLocations(searchTerm), HttpStatus.OK);
     }
 
-    @PostMapping("/add-location")
+    @PostMapping("/add")
     public ResponseEntity<String> addNewLocation(@RequestBody List<AddLocationRequestDTO> locationRequestDTO) {
         return new ResponseEntity<>(locationService.addNewLocation(locationRequestDTO),HttpStatus.OK);
     }

@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -26,6 +29,7 @@ public class PropertyDetailsResponse {
     private Boolean petFriendly = false;
     private String tenantPreference;
     private String mediaLinkUrl;
+    private List<String> images;
     private LocationResponse locationDetails;
 
 }

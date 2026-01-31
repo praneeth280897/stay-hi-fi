@@ -7,13 +7,13 @@ import org.springframework.data.domain.Page;
 public class Meta {
 
     private int page;
-    private int totalRecords;
+    private long totalRecords;
     private long totalPages;
     private long pageSize;
 
     public Meta(Page<?> page) {
         this.page = page.getNumber();
-        this.totalRecords = page.getNumberOfElements();
+        this.totalRecords = page.getTotalElements();
         this.totalPages = page.getTotalPages();
         this.pageSize = page.getSize();
 
