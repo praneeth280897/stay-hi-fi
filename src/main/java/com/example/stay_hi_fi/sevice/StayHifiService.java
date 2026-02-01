@@ -1,5 +1,6 @@
 package com.example.stay_hi_fi.sevice;
 
+import com.example.stay_hi_fi.entity.AddImagesRequestDTO;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
@@ -25,4 +26,6 @@ public interface StayHifiService {
     String addProperty(List<PropertyDetailsRequestDTO> propertyDetailsRequest);
 
     PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO propertyDetailsSearchRequestDTO, int pageNumber, int pageSize);
+
+    String addImages(List<AddImagesRequestDTO> addImagesRequestDTO);
 }

@@ -1,5 +1,6 @@
 package com.example.stay_hi_fi.controller;
 
+import com.example.stay_hi_fi.entity.AddImagesRequestDTO;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
@@ -55,5 +56,10 @@ public class StayHiFiController {
         PaginationResponseDTO<PropertyDetailsResponse> response =
                 stayHifiService.searchPropertyBy(propertyDetailsSearchRequestDTO,pageNumber,pageSize);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/add-image")
+    public String addImages(@RequestBody List<AddImagesRequestDTO> addImagesRequestDTO) {
+        return stayHifiService.addImages(addImagesRequestDTO);
     }
 }

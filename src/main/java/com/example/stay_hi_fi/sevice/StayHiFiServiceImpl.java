@@ -1,11 +1,10 @@
 package com.example.stay_hi_fi.sevice;
 
-import com.example.stay_hi_fi.entity.LocationEntity;
-import com.example.stay_hi_fi.entity.PropertyDetailsEntity;
-import com.example.stay_hi_fi.entity.PropertyLocationMapperEntity;
+import com.example.stay_hi_fi.entity.*;
 import com.example.stay_hi_fi.repository.LocationRepository;
 import com.example.stay_hi_fi.repository.PropertyDetailsRepository;
 import com.example.stay_hi_fi.repository.PropertyLocationMapperEntityRepository;
+import com.example.stay_hi_fi.repository.PropertyMediaDetailsRepository;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
@@ -34,6 +33,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StayHiFiServiceImpl implements StayHifiService {
@@ -46,6 +46,9 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     @Autowired
     private PropertyLocationMapperEntityRepository propertyLocationMapperEntityRepository;
+
+    @Autowired
+    private PropertyMediaDetailsRepository propertyMediaDetailsRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -156,6 +159,9 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsResponse.setFeasibleVisitDate(propertyDetailsEntity.getFeasibleVisitDate());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setMoveInDate(propertyDetailsEntity.getMoveInDate());
+        if(!propertyDetailsEntity.getPropertyMediaUrl().isEmpty()) {
+            propertyDetailsResponse.setImages(propertyDetailsEntity.getPropertyMediaUrl().stream().map(PropertyMediaMapperEntity::getUrl).collect(Collectors.toList()));
+        }
         propertyDetailsResponse.setLocationDetails(mapLocation(propertyDetailsEntity.getPropertyLocationMapper()));
         return propertyDetailsResponse;
     }
@@ -281,4 +287,21 @@ public class StayHiFiServiceImpl implements StayHifiService {
         };
     }
 
+    @Override
+    public String addImages(List<AddImagesRequestDTO> addImagesRequestDTO) {
+
+        List<PropertyMediaMapperEntity> propertyMediaMapperEntities = new ArrayList<>();
+        for(AddImagesRequestDTO addImages:addImagesRequestDTO){
+
+            for(String url:addImages.getUrl()){
+                PropertyMediaMapperEntity propertyMediaMapperEntity = new PropertyMediaMapperEntity();
+                PropertyDetailsEntity propertyDetailsEntity = propertyDetailsRepository.findById(addImages.getPropertyId()).get();
+                propertyMediaMapperEntity.setPropertyDetails(propertyDetailsEntity);
+                propertyMediaMapperEntity.setUrl(url);
+                propertyMediaMapperEntities.add(propertyMediaMapperEntity);
+            }
+        }
+        propertyMediaDetailsRepository.saveAll(propertyMediaMapperEntities);
+        return "SUCCESS";
+    }
 }

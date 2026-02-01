@@ -3,9 +3,10 @@ package com.example.stay_hi_fi.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "tbl_property_details",schema = "stay_hi_fi")
+@Table(schema = "stay_hi_fi",name = "tbl_property_details")
 @Data
 public class PropertyDetailsEntity extends AuditEntity {
 
@@ -57,4 +58,7 @@ public class PropertyDetailsEntity extends AuditEntity {
 
     @OneToOne(mappedBy = "property", cascade = CascadeType.ALL)
     private PropertyLocationMapperEntity propertyLocationMapper;
+
+    @OneToMany(mappedBy = "propertyDetails", fetch = FetchType.LAZY)
+    private List<PropertyMediaMapperEntity> propertyMediaUrl;
 }
