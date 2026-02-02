@@ -12,6 +12,7 @@ import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.util.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
@@ -36,6 +38,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class StayHiFiServiceImpl implements StayHifiService {
 
     @Autowired
@@ -133,7 +136,12 @@ public class StayHiFiServiceImpl implements StayHifiService {
     @Override
     public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        StopWatch sw = new StopWatch();
+
+        sw.start("Database Query");
         Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(pageable);
+        sw.stop();
+        log.info("RepoTime:::::",sw.getTotalTimeSeconds()+"sec");
         Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
 
         return new PaginationResponseDTO<>(propertyDetails);
