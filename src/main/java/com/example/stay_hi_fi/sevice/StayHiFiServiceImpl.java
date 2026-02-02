@@ -191,21 +191,15 @@ public class StayHiFiServiceImpl implements StayHifiService {
         for (PropertyDetailsRequestDTO property : propertyDetailsRequest) {
             PropertyLocationMapperEntity propertyLocationMapperEntity = new PropertyLocationMapperEntity();
 
-            PropertyDetailsEntity propertyDetailsEntity = new PropertyDetailsEntity();
-            propertyDetailsEntity.setPropertyType(property.getPropertyType());
-            propertyDetailsEntity.setPropertyDescription(property.getPropertyDescription());
-            propertyDetailsEntity.setDeposit(property.getDeposit());
-            propertyDetailsEntity.setPropertyName(property.getPropertyName());
-            propertyDetailsEntity.setPetFriendly(property.getPetFriendly());
-            propertyDetailsEntity.setMediaLinkUrl(property.getMediaLinkUrl());
-            propertyDetailsEntity.setTenantPreference(property.getTenantPreference());
-            propertyDetailsEntity.setMoveInDate(property.getMoveInDate());
-            propertyDetailsEntity.setFurnishingType(property.getFurnishingType());
-            propertyDetailsEntity.setFeasibleVisitDate(property.getFeasibleVisitDate());
-            propertyDetailsEntity.setMaintenanceCharges(property.getMaintenanceCharges());
-            propertyDetailsEntity.setRent(property.getRent());
-            Optional<LocationEntity> location = locationRepository.findByCityAndStateAndCountryAndArea(property.getLocationDetails().getCity(), property.getLocationDetails().getState(), property.getLocationDetails().getCountry(), property.getLocationDetails().getArea());
+            PropertyDetailsEntity propertyDetailsEntity = getPropertyDetails(property);
             LocationEntity locationEntity = new LocationEntity();
+            Optional<LocationEntity> location = Optional.empty();
+            if(property.getLocationDetails().getArea()!=null) {
+               location = locationRepository.findByCityAndStateAndCountryAndArea(property.getLocationDetails().getCity(), property.getLocationDetails().getState(), property.getLocationDetails().getCountry(), property.getLocationDetails().getArea());
+            }
+            else if(property.getLocationDetails().getCity()!=null) {
+                location = locationRepository.findByCityAndStateAndCountry(property.getLocationDetails().getCity(),property.getLocationDetails().getState(),property.getLocationDetails().getCountry());
+            }
             if (location.isPresent()) {
                 locationEntity = location.get();
             } else {
@@ -233,6 +227,23 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsRepository.saveAll(properties);
         propertyLocationMapperEntityRepository.saveAll(propertyLocationMapperEntities);
         return Constants.SUCCESS;
+    }
+
+    private static PropertyDetailsEntity getPropertyDetails(PropertyDetailsRequestDTO property) {
+        PropertyDetailsEntity propertyDetailsEntity = new PropertyDetailsEntity();
+        propertyDetailsEntity.setPropertyType(property.getPropertyType());
+        propertyDetailsEntity.setPropertyDescription(property.getPropertyDescription());
+        propertyDetailsEntity.setDeposit(property.getDeposit());
+        propertyDetailsEntity.setPropertyName(property.getPropertyName());
+        propertyDetailsEntity.setPetFriendly(property.getPetFriendly());
+        propertyDetailsEntity.setMediaLinkUrl(property.getMediaLinkUrl());
+        propertyDetailsEntity.setTenantPreference(property.getTenantPreference());
+        propertyDetailsEntity.setMoveInDate(property.getMoveInDate());
+        propertyDetailsEntity.setFurnishingType(property.getFurnishingType());
+        propertyDetailsEntity.setFeasibleVisitDate(property.getFeasibleVisitDate());
+        propertyDetailsEntity.setMaintenanceCharges(property.getMaintenanceCharges());
+        propertyDetailsEntity.setRent(property.getRent());
+        return propertyDetailsEntity;
     }
 
     @Override
