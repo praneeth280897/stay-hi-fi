@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,10 +140,61 @@ public class StayHiFiServiceImpl implements StayHifiService {
     @Transactional(readOnly = true)
     public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAllOptimized(pageable);
-        Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
+        CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() ->
+                propertyDetailsRepository.countOnly());
 
+        List<PropertyDetailsProjection> content = propertyDetailsRepository.findDataOnly(pageable);
+
+        long totalElements = countFuture.join();
+        Page<PropertyDetailsResponse> propertyDetails = new PageImpl<>(content, pageable, totalElements)
+                .map(this::mapProjectionToResponse);
         return new PaginationResponseDTO<>(propertyDetails);
+    }
+
+    private PropertyDetailsResponse mapProjectionToResponse(PropertyDetailsProjection p) {
+        PropertyDetailsResponse response = new PropertyDetailsResponse();
+
+        // Direct mapping from Proxy interface (very fast)
+        response.setId(p.getId());
+        response.setPropertyName(p.getPropertyName());
+        response.setRent(p.getRent());
+        response.setPropertyType(p.getPropertyType());
+        response.setPropertyDescription(p.getPropertyDescription());
+        response.setFurnishingType(p.getFurnishingType());
+        response.setFeasibleVisitDate(p.getFeasibleVisitDate());
+        response.setMaintenanceCharges(p.getMaintenanceCharges());
+        response.setDeposit(p.getDeposit());
+        response.setMoveInDate(p.getMoveInDate());
+        response.setPetFriendly(p.getPetFriendly());
+        response.setTenantPreference(p.getTenantPreference());
+        response.setMediaLinkUrl(p.getMediaLinkUrl());
+
+        // High-performance media sorting (one pass, no streams)
+        List<PropertyMediaMapperEntity> mediaList = p.getMediaMapper();
+        if (mediaList != null && !mediaList.isEmpty()) {
+            List<String> imgs = new ArrayList<>();
+            List<String> vids = new ArrayList<>();
+            for (PropertyMediaMapperEntity m : mediaList) {
+                String url = m.getUrl();
+                if (url != null) {
+                    String lower = url.toLowerCase();
+                    if (lower.endsWith(".mp4") || lower.endsWith(".mov")) {
+                        vids.add(url);
+                    } else {
+                        imgs.add(url);
+                    }
+                }
+            }
+            response.setImages(imgs);
+            response.setVideos(vids);
+        }
+
+        // Location mapping
+        if (p.getPropertyLocationMapper() != null) {
+            response.setLocationDetails(mapLocation(p.getPropertyLocationMapper()));
+        }
+
+        return response;
     }
 
 
@@ -165,9 +218,27 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsResponse.setFeasibleVisitDate(propertyDetailsEntity.getFeasibleVisitDate());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setMoveInDate(propertyDetailsEntity.getMoveInDate());
-        if(!propertyDetailsEntity.getMediaMapper().isEmpty()) {
-            propertyDetailsResponse.setImages(propertyDetailsEntity.getMediaMapper().stream().map(PropertyMediaMapperEntity::getUrl).collect(Collectors.toList()));
+        List<PropertyMediaMapperEntity> mediaList = propertyDetailsEntity.getMediaMapper();
+
+        if (mediaList != null && !mediaList.isEmpty()) {
+            List<String> images = new ArrayList<>();
+            List<String> videos = new ArrayList<>();
+
+            for (PropertyMediaMapperEntity media : mediaList) {
+                String url = media.getUrl();
+                if (url == null) continue;
+
+                String lowerUrl = url.toLowerCase();
+                if (lowerUrl.endsWith(".mp4") || lowerUrl.endsWith(".mov")) {
+                    videos.add(url);
+                } else {
+                    images.add(url);
+                }
+            }
+            propertyDetailsResponse.setImages(images);
+            propertyDetailsResponse.setVideos(videos);
         }
+
         propertyDetailsResponse.setLocationDetails(mapLocation(propertyDetailsEntity.getPropertyLocationMapper()));
         return propertyDetailsResponse;
     }

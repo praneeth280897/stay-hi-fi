@@ -1,16 +1,16 @@
 package com.example.stay_hi_fi.repository;
 
 import com.example.stay_hi_fi.entity.PropertyDetailsEntity;
+import com.example.stay_hi_fi.response.PropertyDetailsResponse;
+import com.example.stay_hi_fi.sevice.PropertyDetailsProjection;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.QueryHint;
 import java.util.List;
 
 public interface PropertyDetailsRepository extends JpaRepository<PropertyDetailsEntity, Long>, JpaSpecificationExecutor<PropertyDetailsEntity> {
@@ -34,9 +34,17 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
             @Param("lng") double lon,
             @Param("radius") double radiusInKm);
 
-    @EntityGraph(value = "Property.fullDetails", type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(value = "Property.leanDetails", type = EntityGraph.EntityGraphType.LOAD)
+    @Query(value = "SELECT p FROM PropertyDetailsEntity p",
+            countQuery = "SELECT count(p.id) FROM PropertyDetailsEntity p")
+    Page<PropertyDetailsProjection> findAllOptimized(Pageable pageable);
+
+    @EntityGraph(value = "Property.leanDetails")
     @Query("SELECT p FROM PropertyDetailsEntity p")
-    Page<PropertyDetailsEntity> findAllOptimized(Pageable pageable);
+    List<PropertyDetailsProjection> findDataOnly(Pageable pageable);
+
+    @Query("SELECT count(p.id) FROM PropertyDetailsEntity p")
+    long countOnly();
 
     @EntityGraph(attributePaths = {"propertyLocationMapper.location"})
     @Query(value = "SELECT p FROM PropertyDetailsEntity p",

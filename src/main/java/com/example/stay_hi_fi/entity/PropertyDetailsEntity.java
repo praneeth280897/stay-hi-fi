@@ -11,11 +11,9 @@ import java.util.List;
 @Table(schema = "stay_hi_fi",name = "tbl_property_details")
 @Data
 @NamedEntityGraph(
-        name = "Property.fullDetails",
+        name = "Property.leanDetails",
         attributeNodes = {
-                // We keep the OneToOne because it doesn't break pagination
-                @NamedAttributeNode(value = "propertyLocationMapper", subgraph = "location-subgraph"),
-                @NamedAttributeNode("mediaMapper")
+                @NamedAttributeNode(value = "propertyLocationMapper", subgraph = "location-subgraph")
         },
         subgraphs = {
                 @NamedSubgraph(
