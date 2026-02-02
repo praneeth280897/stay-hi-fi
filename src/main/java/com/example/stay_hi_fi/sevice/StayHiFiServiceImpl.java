@@ -136,12 +136,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
     @Override
     public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        StopWatch sw = new StopWatch();
-
-        sw.start("Database Query");
-        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(pageable);
-        sw.stop();
-        log.info("RepoTime:::::",sw.getTotalTimeSeconds()+"sec");
+        Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAllOptimized(pageable);
         Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
 
         return new PaginationResponseDTO<>(propertyDetails);
@@ -167,8 +162,8 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyDetailsResponse.setFeasibleVisitDate(propertyDetailsEntity.getFeasibleVisitDate());
         propertyDetailsResponse.setDeposit(propertyDetailsEntity.getDeposit());
         propertyDetailsResponse.setMoveInDate(propertyDetailsEntity.getMoveInDate());
-        if(!propertyDetailsEntity.getPropertyMediaUrl().isEmpty()) {
-            propertyDetailsResponse.setImages(propertyDetailsEntity.getPropertyMediaUrl().stream().map(PropertyMediaMapperEntity::getUrl).collect(Collectors.toList()));
+        if(!propertyDetailsEntity.getMediaMapper().isEmpty()) {
+            propertyDetailsResponse.setImages(propertyDetailsEntity.getMediaMapper().stream().map(PropertyMediaMapperEntity::getUrl).collect(Collectors.toList()));
         }
         propertyDetailsResponse.setLocationDetails(mapLocation(propertyDetailsEntity.getPropertyLocationMapper()));
         return propertyDetailsResponse;

@@ -8,6 +8,20 @@ import java.util.List;
 @Entity
 @Table(schema = "stay_hi_fi",name = "tbl_property_details")
 @Data
+@NamedEntityGraph(
+        name = "Property.fullDetails",
+        attributeNodes = {
+                @NamedAttributeNode("propertyLocationMapper"),
+                @NamedAttributeNode(value = "propertyLocationMapper", subgraph = "location-subgraph"),
+                @NamedAttributeNode("mediaMapper")
+        },
+        subgraphs = {
+                @NamedSubgraph(
+                        name = "location-subgraph",
+                        attributeNodes = @NamedAttributeNode("location")
+                )
+        }
+)
 public class PropertyDetailsEntity extends AuditEntity {
 
     private static final Long serialVersionID = 1L;
@@ -60,5 +74,5 @@ public class PropertyDetailsEntity extends AuditEntity {
     private PropertyLocationMapperEntity propertyLocationMapper;
 
     @OneToMany(mappedBy = "propertyDetails", fetch = FetchType.LAZY)
-    private List<PropertyMediaMapperEntity> propertyMediaUrl;
+    private List<PropertyMediaMapperEntity> mediaMapper;
 }
