@@ -136,7 +136,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
         Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(pageable);
         Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
 
-        return new PaginationResponseDTO(propertyDetails);
+        return new PaginationResponseDTO<>(propertyDetails);
     }
 
     private PropertyDetailsResponse setPropertyResponse(PropertyDetailsEntity propertyDetailsEntity) {
