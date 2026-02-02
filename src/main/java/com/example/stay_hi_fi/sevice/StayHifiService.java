@@ -28,4 +28,6 @@ public interface StayHifiService {
     PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO propertyDetailsSearchRequestDTO, int pageNumber, int pageSize);
 
     String addImages(List<AddImagesRequestDTO> addImagesRequestDTO);
+
+    PropertyDetailsResponse getPropertyDetailsById(long id);
 }

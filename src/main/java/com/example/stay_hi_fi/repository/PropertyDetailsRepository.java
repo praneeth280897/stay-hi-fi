@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import javax.persistence.QueryHint;
 import java.util.List;
+import java.util.Optional;
 
 public interface PropertyDetailsRepository extends JpaRepository<PropertyDetailsEntity, Long>, JpaSpecificationExecutor<PropertyDetailsEntity> {
 
@@ -45,6 +46,13 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
 
     @Query("SELECT count(p.id) FROM PropertyDetailsEntity p")
     long countOnly();
+
+    @Query("SELECT p FROM PropertyDetailsEntity p " +
+            "LEFT JOIN FETCH p.propertyLocationMapper l " +
+            "LEFT JOIN FETCH l.location " +
+            "LEFT JOIN FETCH p.mediaMapper " +
+            "WHERE p.id = :id")
+    Optional<PropertyDetailsEntity> findByIdOptimized(@Param("id") Long id);
 
     @EntityGraph(attributePaths = {"propertyLocationMapper.location"})
     @Query(value = "SELECT p FROM PropertyDetailsEntity p",

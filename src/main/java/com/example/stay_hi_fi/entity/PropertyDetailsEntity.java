@@ -14,6 +14,7 @@ import java.util.List;
         name = "Property.leanDetails",
         attributeNodes = {
                 @NamedAttributeNode(value = "propertyLocationMapper", subgraph = "location-subgraph")
+
         },
         subgraphs = {
                 @NamedSubgraph(

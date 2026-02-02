@@ -62,4 +62,9 @@ public class StayHiFiController {
     public String addImages(@RequestBody List<AddImagesRequestDTO> addImagesRequestDTO) {
         return stayHifiService.addImages(addImagesRequestDTO);
     }
+
+    @GetMapping(value = "/get-by-id")
+    public ResponseEntity<PropertyDetailsResponse> getPropertyById(@RequestParam(value = "id") long id) {
+        return new ResponseEntity<>(stayHifiService.getPropertyDetailsById(id),HttpStatus.OK);
+    }
 }

@@ -394,4 +394,10 @@ public class StayHiFiServiceImpl implements StayHifiService {
         propertyMediaDetailsRepository.saveAll(propertyMediaMapperEntities);
         return "SUCCESS";
     }
+
+    @Override
+    public PropertyDetailsResponse getPropertyDetailsById(long id) {
+        Optional<PropertyDetailsEntity> propertyDetailsEntity = propertyDetailsRepository.findByIdOptimized(id);
+        return propertyDetailsEntity.map(this::setPropertyResponse).orElse(null);
+    }
 }
