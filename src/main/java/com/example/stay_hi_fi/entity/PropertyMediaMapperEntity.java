@@ -1,6 +1,7 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class PropertyMediaMapperEntity extends AuditEntity implements Serializab
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
+    @ToString.Exclude
     private PropertyDetailsEntity propertyDetails;
 
 }

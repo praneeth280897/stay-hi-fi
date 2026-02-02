@@ -30,6 +30,7 @@ public class PropertyDetailsResponse {
     private String tenantPreference;
     private String mediaLinkUrl;
     private List<String> images;
+    private List<String> videos;
     private LocationResponse locationDetails;
 
 }

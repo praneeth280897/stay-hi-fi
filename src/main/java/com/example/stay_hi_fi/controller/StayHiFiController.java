@@ -51,8 +51,8 @@ public class StayHiFiController {
 
     @PostMapping(value = "/search")
     public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> searchPropertyBy(@RequestBody PropertyDetailsSearchRequestDTO propertyDetailsSearchRequestDTO,
-                                                                                        @RequestParam(defaultValue = "10") int pageSize,
-                                                                                           @RequestParam(defaultValue = "0")int pageNumber) {
+                                                                                        @RequestParam(defaultValue = "10",value = "size") int pageSize,
+                                                                                           @RequestParam(defaultValue = "0",value = "page")int pageNumber) {
         PaginationResponseDTO<PropertyDetailsResponse> response =
                 stayHifiService.searchPropertyBy(propertyDetailsSearchRequestDTO,pageNumber,pageSize);
         return ResponseEntity.ok(response);

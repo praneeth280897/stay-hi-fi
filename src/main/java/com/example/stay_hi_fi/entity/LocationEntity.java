@@ -1,6 +1,7 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -46,6 +47,7 @@ public class LocationEntity extends AuditEntity {
 
     // One location can be used by many properties (via mapper)
     @OneToMany(mappedBy = "location", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<PropertyLocationMapperEntity> propertyMappings;
 
 }

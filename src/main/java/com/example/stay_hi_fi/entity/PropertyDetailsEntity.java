@@ -1,6 +1,8 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 @NamedEntityGraph(
         name = "Property.fullDetails",
         attributeNodes = {
-                @NamedAttributeNode("propertyLocationMapper"),
+                // We keep the OneToOne because it doesn't break pagination
                 @NamedAttributeNode(value = "propertyLocationMapper", subgraph = "location-subgraph"),
                 @NamedAttributeNode("mediaMapper")
         },
@@ -71,8 +73,11 @@ public class PropertyDetailsEntity extends AuditEntity {
     private String location;
 
     @OneToOne(mappedBy = "property", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private PropertyLocationMapperEntity propertyLocationMapper;
 
     @OneToMany(mappedBy = "propertyDetails", fetch = FetchType.LAZY)
+    @BatchSize(size = 25)
+    @ToString.Exclude
     private List<PropertyMediaMapperEntity> mediaMapper;
 }

@@ -21,4 +21,5 @@ public class AddLocationRequestDTO {
     private Double longitude;
     private String area;
     private String locationUrl;
+    private Boolean isMetroCity;
 }

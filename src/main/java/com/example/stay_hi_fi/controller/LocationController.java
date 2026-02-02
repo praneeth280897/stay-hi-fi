@@ -37,4 +37,9 @@ public class LocationController {
         return new ResponseEntity<>(locationService.getMetroCities(),HttpStatus.OK);
     }
 
+    @PostMapping("/edit")
+    public ResponseEntity<String> editLocation(@RequestBody AddLocationRequestDTO locationRequestDTO) {
+        return new ResponseEntity<>(locationService.editLocation(locationRequestDTO),HttpStatus.OK);
+    }
+
 }

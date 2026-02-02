@@ -10,8 +10,11 @@ import com.example.stay_hi_fi.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,7 +58,7 @@ public class LocationServiceImpl implements LocationService{
     @Override
     public String addNewLocation(List<AddLocationRequestDTO> locationRequestDTO) {
 
-            List<LocationEntity> locationEntities = new ArrayList<>();
+        List<LocationEntity> locationEntities = new ArrayList<>();
         for(AddLocationRequestDTO addLocationRequestDTO:locationRequestDTO) {
             Boolean locationIsPresent = locationRepository.findByCityAndStateAndCountryAndArea(addLocationRequestDTO.getCity(),addLocationRequestDTO.getState(),addLocationRequestDTO.getCountry(),addLocationRequestDTO.getArea()).isPresent();
             if(!locationIsPresent) {
@@ -77,7 +80,40 @@ public class LocationServiceImpl implements LocationService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MetroCitiesResponseDTO> getMetroCities() {
-        return null;
+        List<LocationEntity> metroCities = locationRepository.findByIsMetroCity(Boolean.TRUE);
+        List<MetroCitiesResponseDTO> response = new ArrayList<>();
+        for(LocationEntity locationEntity : metroCities) {
+            MetroCitiesResponseDTO metroCity = new MetroCitiesResponseDTO();
+            metroCity.setCityIdentity("Metro City");
+            metroCity.setName(locationEntity.getCity());
+            metroCity.setPropertiesCount((long) locationEntity.getPropertyMappings().size());
+            response.add(metroCity);
+        }
+
+        return response;
+    }
+
+    @Override
+    public String editLocation(AddLocationRequestDTO locationRequestDTO) {
+        Optional<LocationEntity> locationEntity = locationRepository.findById(locationRequestDTO.getId());
+
+        if(locationEntity.isPresent()) {
+            LocationEntity location = locationEntity.get();
+            location.setIsMetroCity(locationRequestDTO.getIsMetroCity());
+            location.setArea(locationRequestDTO.getArea());
+            location.setCity(locationRequestDTO.getCity());
+            location.setPostalCode(locationRequestDTO.getPostalCode());
+            location.setCountry(locationRequestDTO.getCountry());
+            location.setLatitude(locationRequestDTO.getLatitude()!=null?locationRequestDTO.getLatitude():0);
+            location.setLongitude(locationRequestDTO.getLongitude()!=null?locationRequestDTO.getLongitude():0);
+            location.setState(locationRequestDTO.getState());
+            location.setStateAbbreviation(locationRequestDTO.getStateAbv());
+            location.setUpdatedBy(SYSTEM);
+            location.setUpdatedDate(new Date());
+            locationRepository.save(location);
+        }
+        return "SUCCESS";
     }
 }

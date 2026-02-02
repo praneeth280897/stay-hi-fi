@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -134,6 +135,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAllOptimized(pageable);
@@ -141,6 +143,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
         return new PaginationResponseDTO<>(propertyDetails);
     }
+
 
     private PropertyDetailsResponse setPropertyResponse(PropertyDetailsEntity propertyDetailsEntity) {
         PropertyDetailsResponse propertyDetailsResponse = new PropertyDetailsResponse();
@@ -215,6 +218,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
                 locationEntity.setCity(property.getLocationDetails().getCity());
                 locationEntity.setPostalCode(property.getLocationDetails().getPostalCode());
                 locationEntity.setStateAbbreviation(property.getLocationDetails().getStateAbv());
+                locationEntity.setIsMetroCity(property.getLocationDetails().getIsMetroCity());
                 locationRepository.save(locationEntity);
             }
             propertyLocationMapperEntity.setLocation(locationEntity);
@@ -250,6 +254,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResponseDTO<PropertyDetailsResponse> searchPropertyBy(PropertyDetailsSearchRequestDTO requestDTO, int pageNumber, int pageSize) {
         Specification<PropertyDetailsEntity> spec = getSearchQuery(requestDTO);
         Pageable pageable = PageRequest.of(pageNumber, pageSize);

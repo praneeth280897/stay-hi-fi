@@ -1,6 +1,7 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -15,11 +16,13 @@ public class PropertyLocationMapperEntity extends AuditEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
+    @ToString.Exclude
     private LocationEntity location;
 
     // Join to property table
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false, unique = true)
+    @ToString.Exclude
     private PropertyDetailsEntity property;
 
     @Column(name = "lat")

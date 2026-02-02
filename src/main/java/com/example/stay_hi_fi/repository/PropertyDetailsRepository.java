@@ -1,8 +1,10 @@
 package com.example.stay_hi_fi.repository;
 
 import com.example.stay_hi_fi.entity.PropertyDetailsEntity;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -35,4 +37,9 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
     @EntityGraph(value = "Property.fullDetails", type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT p FROM PropertyDetailsEntity p")
     Page<PropertyDetailsEntity> findAllOptimized(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"propertyLocationMapper.location"})
+    @Query(value = "SELECT p FROM PropertyDetailsEntity p",
+            countQuery = "SELECT count(p.id) FROM PropertyDetailsEntity p")
+    Page<PropertyDetailsEntity> findAll(Specification<PropertyDetailsEntity> spec, Pageable pageable);
 }

@@ -13,4 +13,6 @@ public interface LocationService {
     String addNewLocation(List<AddLocationRequestDTO> locationRequestDTO);
 
     List<MetroCitiesResponseDTO> getMetroCities();
+
+    String editLocation(AddLocationRequestDTO locationRequestDTO);
 }
