@@ -1,16 +1,13 @@
 package com.example.stay_hi_fi.controller;
 
 import com.example.stay_hi_fi.entity.AddImagesRequestDTO;
-import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
-import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.PaginationResponseDTO;
 import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.StayHifiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

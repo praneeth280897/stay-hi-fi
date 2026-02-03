@@ -3,8 +3,6 @@ package com.example.stay_hi_fi.controller;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.response.LocationResponse;
 import com.example.stay_hi_fi.response.MetroCitiesResponseDTO;
-import com.example.stay_hi_fi.response.PaginationResponseDTO;
-import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.LocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
