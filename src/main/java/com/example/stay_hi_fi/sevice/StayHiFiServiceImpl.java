@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
@@ -136,12 +137,16 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize) {
+    public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize,String city) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() ->
                 propertyDetailsRepository.countOnly());
-
-        List<PropertyDetailsProjection> content = propertyDetailsRepository.findDataOnly(pageable);
+        List<PropertyDetailsProjection> content = new ArrayList<>();
+        if(StringUtils.isEmpty(city)){
+          content  = propertyDetailsRepository.findDataOnly(pageable);
+        } else {
+            content = propertyDetailsRepository.findByStateOptimized(city,pageable);
+        }
 
         long totalElements = countFuture.join();
         Page<PropertyDetailsResponse> propertyDetails = new PageImpl<>(content, pageable, totalElements)

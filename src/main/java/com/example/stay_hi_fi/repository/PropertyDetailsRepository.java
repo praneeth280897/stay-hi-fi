@@ -55,6 +55,13 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
             "WHERE p.id = :id")
     Optional<PropertyDetailsEntity> findByIdOptimized(@Param("id") Long id);
 
+    @Query("SELECT p FROM PropertyDetailsEntity p" +
+            " LEFT JOIN FETCH p.propertyLocationMapper mapper" +
+            " LEFT JOIN FETCH mapper.location loc" +
+            " LEFT JOIN FETCH p.mediaMapper" +
+            " WHERE loc.city = :city")
+    List<PropertyDetailsProjection> findByStateOptimized(@Param("city") String city,Pageable pageable);
+
     @EntityGraph(attributePaths = {"propertyLocationMapper.location"})
     @Query(value = "SELECT p FROM PropertyDetailsEntity p",
             countQuery = "SELECT count(p.id) FROM PropertyDetailsEntity p")

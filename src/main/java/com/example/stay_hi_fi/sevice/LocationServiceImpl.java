@@ -23,6 +23,8 @@ import java.util.Optional;
 public class LocationServiceImpl implements LocationService{
 
     private static final String SYSTEM= "SYS";
+
+    private static final String METRO_CITY = "METRO CITY";
     @Autowired
     private LocationRepository locationRepository;
 
@@ -86,7 +88,7 @@ public class LocationServiceImpl implements LocationService{
         List<MetroCitiesResponseDTO> response = new ArrayList<>();
         for(LocationEntity locationEntity : metroCities) {
             MetroCitiesResponseDTO metroCity = new MetroCitiesResponseDTO();
-            metroCity.setCityIdentity("Metro City");
+            metroCity.setCityIdentity(METRO_CITY);
             metroCity.setName(locationEntity.getCity());
             metroCity.setPropertiesCount((long) locationEntity.getPropertyMappings().size());
             response.add(metroCity);

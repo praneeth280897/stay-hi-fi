@@ -21,7 +21,7 @@ public interface StayHifiService {
 
     void addPropertyByFile(MultipartFile multipartFile) throws IOException;
 
-    PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize);
+    PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize,String state);
 
     String addProperty(List<PropertyDetailsRequestDTO> propertyDetailsRequest);
 
