@@ -8,6 +8,7 @@ import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.StayHifiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class StayHiFiController {
     @GetMapping(value = "/get")
         public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10",value = "size") int pageSize,
                                                                                                 @RequestParam(defaultValue = "0",value = "page")int pageNumber,
-                                                                                                    @RequestParam (value = "city")String city) {
+                                                                                                    @RequestParam (value = "city", required = false)String city) {
         PaginationResponseDTO<PropertyDetailsResponse> response =
                 stayHifiService.getAllPropertyDetails(pageNumber, pageSize,city);
         return ResponseEntity.ok(response);
