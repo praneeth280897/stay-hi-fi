@@ -29,7 +29,6 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
             "HAVING distance <= :radius " +
             "ORDER BY distance",
             nativeQuery = true)
-
     List<PropertyDetailsEntity> findNearbyProperties(
             @Param("lat") double lat,
             @Param("lng") double lon,
@@ -66,4 +65,6 @@ public interface PropertyDetailsRepository extends JpaRepository<PropertyDetails
     @Query(value = "SELECT p FROM PropertyDetailsEntity p",
             countQuery = "SELECT count(p.id) FROM PropertyDetailsEntity p")
     Page<PropertyDetailsEntity> findAll(Specification<PropertyDetailsEntity> spec, Pageable pageable);
+
+    List<PropertyDetailsEntity> findAllByIdIn(List<Long> propertyIds);
 }

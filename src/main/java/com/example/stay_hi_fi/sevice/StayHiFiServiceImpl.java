@@ -1,10 +1,7 @@
 package com.example.stay_hi_fi.sevice;
 
 import com.example.stay_hi_fi.entity.*;
-import com.example.stay_hi_fi.repository.LocationRepository;
-import com.example.stay_hi_fi.repository.PropertyDetailsRepository;
-import com.example.stay_hi_fi.repository.PropertyLocationMapperEntityRepository;
-import com.example.stay_hi_fi.repository.PropertyMediaDetailsRepository;
+import com.example.stay_hi_fi.repository.*;
 import com.example.stay_hi_fi.request.AddLocationRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsRequestDTO;
 import com.example.stay_hi_fi.request.PropertyDetailsSearchRequestDTO;
@@ -34,10 +31,10 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.sql.Array;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -57,6 +54,9 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private UserPropertyMapperRepository userPropertyMapperRepository;
 
     @Override
     public String addLocation(AddLocationRequestDTO addLocationRequestDTO) {
@@ -112,7 +112,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
             propertyDetailsEntity.setLocation(row.getCell(3).getStringCellValue());
             propertyDetailsEntity.setFeasibleVisitDate(row.getCell(4).getStringCellValue());
             propertyDetailsEntity.setPropertyType(row.getCell(5).getStringCellValue());
-            propertyDetailsEntity.setRent(Double.valueOf(row.getCell(7).getNumericCellValue()));
+            propertyDetailsEntity.setRent(row.getCell(7).getNumericCellValue());
             propertyDetailsEntity.setFurnishingType(row.getCell(6).getStringCellValue());
             propertyDetailsEntity.setDeposit(formatter.formatCellValue(row.getCell(8)));
             propertyDetailsEntity.setMaintenanceCharges(formatter.formatCellValue(row.getCell(10)));
@@ -137,7 +137,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize,String city) {
+    public PaginationResponseDTO<PropertyDetailsResponse> getAllPropertyDetails(int pageNumber, int pageSize,String city,Long userId) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         CompletableFuture<Long> countFuture = CompletableFuture.supplyAsync(() ->
                 propertyDetailsRepository.countOnly());
@@ -147,10 +147,27 @@ public class StayHiFiServiceImpl implements StayHifiService {
         } else {
             content = propertyDetailsRepository.findByStateOptimized(city,pageable);
         }
+        List<Long> propertyIds;
+        if(userId != null){
+            Optional<UserPropertyMapping> userPropertyMapping = userPropertyMapperRepository.findByUserId(userId);
 
+            if(userPropertyMapping.isPresent()){
+                String property = userPropertyMapping.get().getPropertyId();
+                List<String> properties = property.contains(",") ? Arrays.asList(property.split(",")): Collections.singletonList(property);
+                propertyIds = properties.stream().map(Long::valueOf).collect(Collectors.toList());
+            } else {
+                propertyIds = new ArrayList<>();
+                throw new RuntimeException();
+            }
+        } else {
+            propertyIds = new ArrayList<>();
+        }
         long totalElements = countFuture.join();
         Page<PropertyDetailsResponse> propertyDetails = new PageImpl<>(content, pageable, totalElements)
                 .map(this::mapProjectionToResponse);
+        if(!propertyIds.isEmpty()) {
+            propertyDetails.stream().peek(m -> m.setWishList(propertyIds.contains(m.getId()))).collect(Collectors.toList());
+        }
         return new PaginationResponseDTO<>(propertyDetails);
     }
 
@@ -175,7 +192,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
         // High-performance media sorting (one pass, no streams)
         List<PropertyMediaMapperEntity> mediaList = p.getMediaMapper();
         if (mediaList != null && !mediaList.isEmpty()) {
-            List<String> imgs = new ArrayList<>();
+            List<String> images = new ArrayList<>();
             List<String> vids = new ArrayList<>();
             for (PropertyMediaMapperEntity m : mediaList) {
                 String url = m.getUrl();
@@ -184,11 +201,11 @@ public class StayHiFiServiceImpl implements StayHifiService {
                     if (lower.endsWith(".mp4") || lower.endsWith(".mov")) {
                         vids.add(url);
                     } else {
-                        imgs.add(url);
+                        images.add(url);
                     }
                 }
             }
-            response.setImages(imgs);
+            response.setImages(images);
             response.setVideos(vids);
         }
 
@@ -334,7 +351,7 @@ public class StayHiFiServiceImpl implements StayHifiService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<PropertyDetailsEntity> propertyDetailsList = propertyDetailsRepository.findAll(spec, pageable);
         Page<PropertyDetailsResponse> propertyDetails = propertyDetailsList.map(this::setPropertyResponse);
-        return new PaginationResponseDTO(propertyDetails);
+        return new PaginationResponseDTO<>(propertyDetails);
     }
 
     private Specification<PropertyDetailsEntity> getSearchQuery(PropertyDetailsSearchRequestDTO dto) {
@@ -373,8 +390,6 @@ public class StayHiFiServiceImpl implements StayHifiService {
                 predicates.add(cb.equal(locationJoin.get("id"), dto.getLocation().getId()));
             }
 
-//            if(dto.getLocation() != null)
-
             query.distinct(true);
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -395,12 +410,29 @@ public class StayHiFiServiceImpl implements StayHifiService {
             }
         }
         propertyMediaDetailsRepository.saveAll(propertyMediaMapperEntities);
-        return "SUCCESS";
+        return Constants.SUCCESS;
     }
 
     @Override
     public PropertyDetailsResponse getPropertyDetailsById(long id) {
         Optional<PropertyDetailsEntity> propertyDetailsEntity = propertyDetailsRepository.findByIdOptimized(id);
         return propertyDetailsEntity.map(this::setPropertyResponse).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PropertyDetailsResponse> getWishListDetails(Long userId) {
+        List<PropertyDetailsResponse> propertyDetailsResponses = new ArrayList<>();
+        Optional<UserPropertyMapping> userPropertyMapping = userPropertyMapperRepository.findByUserId(userId);
+        if(userPropertyMapping.isPresent()){
+            List<String> properties = userPropertyMapping.get().getPropertyId().contains(",")? Arrays.asList(userPropertyMapping.get().getPropertyId().split(",")):Collections.singletonList(userPropertyMapping.get().getPropertyId());
+            List<Long> propertyId = properties.stream().map(Long::parseLong).collect(Collectors.toList());
+
+            List<PropertyDetailsEntity> propertyDetailsEntities = propertyDetailsRepository.findAllByIdIn(propertyId);
+            for(PropertyDetailsEntity propertyDetailsEntity:propertyDetailsEntities){
+                propertyDetailsResponses.add(setPropertyResponse(propertyDetailsEntity));
+            }
+        }
+        return propertyDetailsResponses;
     }
 }

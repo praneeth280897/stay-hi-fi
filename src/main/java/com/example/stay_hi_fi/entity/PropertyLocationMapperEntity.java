@@ -1,18 +1,16 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(schema = "stay_hi_fi",name = "tbl_property_loc_mapper")
 @Data
 public class PropertyLocationMapperEntity extends AuditEntity{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)

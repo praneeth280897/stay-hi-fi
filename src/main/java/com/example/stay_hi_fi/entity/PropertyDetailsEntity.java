@@ -1,12 +1,14 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(schema = "stay_hi_fi",name = "tbl_property_details")
 @Data
@@ -27,15 +29,10 @@ public class PropertyDetailsEntity extends AuditEntity {
 
     private static final Long serialVersionID = 1L;
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "move_in_date")
     private String moveInDate;
 
-    @Column(name = "maintenance_charges")
+    @Column(name = "s")
     private String maintenanceCharges;
 
     @Column(name = "property_name")

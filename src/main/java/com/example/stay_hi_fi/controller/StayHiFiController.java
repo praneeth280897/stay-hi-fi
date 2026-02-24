@@ -8,7 +8,6 @@ import com.example.stay_hi_fi.response.PropertyDetailsResponse;
 import com.example.stay_hi_fi.sevice.StayHifiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +35,10 @@ public class StayHiFiController {
     @GetMapping(value = "/get")
         public ResponseEntity<PaginationResponseDTO<PropertyDetailsResponse>> getAllPropertyDetails(@RequestParam(defaultValue = "10",value = "size") int pageSize,
                                                                                                 @RequestParam(defaultValue = "0",value = "page")int pageNumber,
-                                                                                                    @RequestParam (value = "city", required = false)String city) {
+                                                                                                    @RequestParam (value = "city", required = false)String city,
+                                                                                                    @RequestParam(value= "userId",required = false) Long userId) {
         PaginationResponseDTO<PropertyDetailsResponse> response =
-                stayHifiService.getAllPropertyDetails(pageNumber, pageSize,city);
+                stayHifiService.getAllPropertyDetails(pageNumber, pageSize,city,userId);
         return ResponseEntity.ok(response);
     }
 
@@ -64,5 +64,10 @@ public class StayHiFiController {
     @GetMapping(value = "/get-by-id")
     public ResponseEntity<PropertyDetailsResponse> getPropertyById(@RequestParam(value = "id") long id) {
         return new ResponseEntity<>(stayHifiService.getPropertyDetailsById(id),HttpStatus.OK);
+    }
+
+    @GetMapping(value = "get/wish-list")
+    public ResponseEntity<List<PropertyDetailsResponse>> getWishList(@RequestParam(value = "userId")Long userId) {
+        return new ResponseEntity<>(stayHifiService.getWishListDetails(userId),HttpStatus.OK);
     }
 }

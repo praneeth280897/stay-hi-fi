@@ -1,22 +1,19 @@
 package com.example.stay_hi_fi.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "tbl_location",schema = "stay_hi_fi")
 public class LocationEntity extends AuditEntity {
 
     private static final Long serialVersionID = 1L;
-
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "city")
     private String city;

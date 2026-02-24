@@ -7,16 +7,17 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @MappedSuperclass
 public abstract class AuditEntity {
 
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name="created_by")
 	@CreatedBy
@@ -37,7 +38,5 @@ public abstract class AuditEntity {
 	@LastModifiedBy
 	@Column(name="updated_at")
 	protected Date updatedDate;
-
-
 
 }
